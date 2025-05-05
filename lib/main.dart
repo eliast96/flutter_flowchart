@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'flowchart.dart';
+import 'flowchart_graph.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -70,56 +73,95 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final List<FlowchartNode> exampleNodes = [
+      FlowchartNode(
+        id: '1',
+        label: 'Start',
+        status: FlowNodeStatus.inProgress,
+        type: FlowStepType.process,
+        followupNodes: [
+          FlowchartNode(
+            id: '2',
+            label: 'Task 1',
+            status: FlowNodeStatus.inProgress,
+            type: FlowStepType.process,
+          ),
+        ],
+      ),
+      FlowchartNode(
+        id: '2',
+        label: 'Task 1',
+        status: FlowNodeStatus.inProgress,
+        type: FlowStepType.process,
+        followupNodes: [
+          FlowchartNode(
+            id: '3',
+            label: 'Task 2',
+            status: FlowNodeStatus.inProgress,
+            type: FlowStepType.process,
+          ),
+        ],
+      ),
+      FlowchartNode(
+        id: '3',
+        label: 'Task 2',
+        status: FlowNodeStatus.inProgress,
+        type: FlowStepType.process,
+      ),
+    ];
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.8,
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: FlowchartGraph(
+            nodes: exampleNodes,
+            displayType: FlowDisplayType.flow,
+            onTaskStatusChanged: ({
+              required String id,
+              required FlowNodeStatus newStatus,
+              required List<FlowchartNode> updatedNodes,
+            }) {
+              // Handle task status change
+              debugPrint('');
+            },
+            onTaskCompleted: ({
+              required String id,
+              required List<FlowchartNode> updatedNodes,
+            }) {
+              // Handle task completion
+              debugPrint('');
+            },
+            onTaskDeleted: ({
+              required String id,
+              required List<FlowchartNode> updatedNodes,
+            }) {
+              // Handle task deletion
+              debugPrint('');
+            },
+            onFlowUpdated: ({
+              required List<FlowchartNode> updatedNodes,
+            }) {
+              // Handle flow update
+              debugPrint('');
+            },
+            onTaskAdded: ({
+              required String label,
+              required String description,
+              required DateTime dueDate,
+              required FlowNodeStatus status,
+              int? daysToFinish,
+            }) {
+              // Handle task addition
+              debugPrint('');
+            },
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
