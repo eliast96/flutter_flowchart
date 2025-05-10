@@ -681,9 +681,20 @@ class _FlowchartGraphState extends State<FlowchartGraph> {
                   //   id: existingTaskID,
                   //   newVal: existingTask,
                   // );
-                  widget.onFlowUpdated(updatedNodes: [existingTask!]);
+                  existingTask!.daysToFinish =
+                      daysToFinishController.text.isEmpty
+                          ? null
+                          : int.parse(daysToFinishController.text);
+                  existingTask.description = taskDescriptionController.text;
+                  existingTask.dueDate =
+                      taskDueDateController.text == "טרם נקבע"
+                          ? null
+                          : dateOutputFormat.parse(taskDueDateController.text);
+                  existingTask.label = taskNameController.text;
+                  widget.onFlowUpdated(updatedNodes: [existingTask]);
+                  _buildGraph();
                   Navigator.of(context).pop();
-                  debugPrint("Added Updated Successfully");
+                  debugPrint("Task Updated Successfully");
                   _showSnackbar(
                     context,
                     "המשימה עודכנה בהצלחה",
@@ -717,11 +728,11 @@ class _FlowchartGraphState extends State<FlowchartGraph> {
 
 class FlowchartNode {
   final String id;
-  final String label;
+  String label;
   final List<FlowchartNode> dependsOnNodes;
   final List<FlowchartNode> followupNodes;
-  final bool isFollowedByDecision;
-  final String? decisionQuestion;
+  bool isFollowedByDecision;
+  String? decisionQuestion;
   String? decisionAnswer;
   final List<FlowchartDecisionNode>? decisionNodes;
   DateTime? dueDate;

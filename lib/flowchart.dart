@@ -82,7 +82,7 @@ class FlowchartState extends State<Flowchart> {
 
   @override
   void initState() {
-    final zoomFactor = 0.25;
+    final zoomFactor = 0.8;
     final xTranslate = 300.0;
     final yTranslate = 300.0;
     viewTransformationController.value.setEntry(0, 0, zoomFactor);
@@ -143,39 +143,55 @@ class FlowchartState extends State<Flowchart> {
     final screenSize = MediaQuery.of(context).size;
     return Directionality(
       textDirection: TextDirection.ltr,
-      child: InteractiveViewer(
-        transformationController: viewTransformationController,
-        minScale: 0.25,
-        maxScale: 1,
-        constrained: false,
-        child: ConstrainedBox(
-          // constraints: BoxConstraints(minWidth: screenSize.width),
-          constraints: BoxConstraints(minWidth: screenSize.width),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: DirectGraph(
-              list: list,
-              defaultCellSize: const Size(250.0, 100.0),
-              cellPadding:
-                  const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-              contactEdgesDistance: 5,
-              orientation: MatrixOrientation.Vertical,
-              nodeBuilder: (BuildContext context, NodeInput node) => Padding(
-                padding: const EdgeInsets.all(5),
-                child: _buildNode(
-                  node,
-                  onDeleteProcess: widget.onDeleteProcess,
-                  onEditProcess: widget.onEditProcess,
-                  onDeleteDecision: widget.onDeleteDecision,
-                  onCompleteTask: widget.onCompleteTask,
+      child: Stack(
+        children: [
+          InteractiveViewer(
+            transformationController: viewTransformationController,
+            minScale: 0.25,
+            maxScale: 1,
+            constrained: false,
+            child: ConstrainedBox(
+              // constraints: BoxConstraints(minWidth: screenSize.width),
+              constraints: BoxConstraints(minWidth: screenSize.width),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: DirectGraph(
+                  list: list,
+                  defaultCellSize: const Size(250.0, 100.0),
+                  cellPadding:
+                      const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+                  contactEdgesDistance: 5,
+                  orientation: MatrixOrientation.Vertical,
+                  nodeBuilder: (BuildContext context, NodeInput node) =>
+                      Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: _buildNode(
+                      node,
+                      onDeleteProcess: widget.onDeleteProcess,
+                      onEditProcess: widget.onEditProcess,
+                      onDeleteDecision: widget.onDeleteDecision,
+                      onCompleteTask: widget.onCompleteTask,
+                    ),
+                  ),
+                  centered: true,
+                  minScale: .1,
+                  maxScale: 1,
                 ),
               ),
-              centered: true,
-              minScale: .1,
-              maxScale: 1,
             ),
           ),
-        ),
+          Positioned(
+            left: 0,
+            top: 0,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                widget.onEditProcess.call(null);
+              },
+              label: Text("הוספת משימה"),
+              icon: Icon(Icons.add_rounded),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -273,7 +289,7 @@ class _ProcessState extends State<Process> {
               onTap: () {
                 if (widget.isSelection &&
                     !(widget.disabledNodes?.contains(widget.id) ?? false)) {
-                  widget.onSelected!.call(int.parse(widget.id));
+                  widget.onSelected!.call(widget.id);
                 }
               },
               child: _getProcessContainer(context),
@@ -405,7 +421,7 @@ class _ProcessState extends State<Process> {
                       }),
                     ),
                     onTap: () async {
-                      await widget.onEdit.call(int.parse(widget.id));
+                      await widget.onEdit.call(widget.id);
                     },
                   ),
                 ],
@@ -585,7 +601,7 @@ class _DecisionState extends State<Decision> {
               );
               if (res != null && res == true) {
                 await widget.onDelete.call(
-                  int.parse(widget.id.replaceAll("__FOLLOWUP", "")),
+                  widget.id.replaceAll("__FOLLOWUP", ""),
                 );
               }
             },

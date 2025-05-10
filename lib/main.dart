@@ -147,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
               required List<FlowchartNode> updatedNodes,
             }) {
               // Handle flow update
-              debugPrint('');
+              debugPrint('Task Updated');
             },
             onTaskAdded: ({
               required String label,
@@ -157,7 +157,19 @@ class _MyHomePageState extends State<MyHomePage> {
               int? daysToFinish,
             }) {
               // Handle task addition
-              debugPrint('');
+              var newNode = FlowchartNode(
+                id: 'newid_${DateTime.now().millisecondsSinceEpoch}',
+                label: label,
+                status: FlowNodeStatus.inProgress,
+                type: FlowStepType.process,
+                daysToFinish: daysToFinish,
+                dueDate: dueDate,
+                description: description,
+              );
+              setState(() {
+                exampleNodes.add(newNode);
+              });
+              debugPrint('Task Added');
             },
           ),
         ),
