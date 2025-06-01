@@ -52,7 +52,9 @@ class Flowchart extends StatefulWidget {
   final Map<String, FlowStep> data;
   final List<NodeInput> flowChart;
   final Function onDeleteProcess;
-  final Function onEditProcess;
+  final Function onAddOrEditProcess;
+  final Function onAddFromPredefined;
+  final Function onEditLinks;
   final Function onDeleteDecision;
   final Function? onCompleteTask;
   final bool isSelection;
@@ -64,7 +66,9 @@ class Flowchart extends StatefulWidget {
     Key? key,
     required this.data,
     required this.flowChart,
-    required this.onEditProcess,
+    required this.onAddOrEditProcess,
+    required this.onAddFromPredefined,
+    required this.onEditLinks,
     required this.onDeleteProcess,
     required this.onDeleteDecision,
     this.onCompleteTask,
@@ -95,6 +99,7 @@ class FlowchartState extends State<Flowchart> {
     NodeInput node, {
     required Function onDeleteProcess,
     required Function onEditProcess,
+    required Function onEditLinks,
     required Function onDeleteDecision,
     Function? onCompleteTask,
   }) {
@@ -108,6 +113,7 @@ class FlowchartState extends State<Flowchart> {
           data: info,
           onDelete: onDeleteProcess,
           onEdit: onEditProcess,
+          onEditLinks: onEditLinks,
           isSelection: widget.isSelection,
           disabledNodes: widget.disabledNodes,
           onCompleted: onCompleteTask,
@@ -126,6 +132,7 @@ class FlowchartState extends State<Flowchart> {
           data: info,
           onDelete: onDeleteProcess,
           onEdit: onEditProcess,
+          onEditLinks: onEditLinks,
           isSelection: widget.isSelection,
           onSelected: widget.onSelected,
           disabledNodes: widget.disabledNodes,
@@ -168,7 +175,8 @@ class FlowchartState extends State<Flowchart> {
                     child: _buildNode(
                       node,
                       onDeleteProcess: widget.onDeleteProcess,
-                      onEditProcess: widget.onEditProcess,
+                      onEditProcess: widget.onAddOrEditProcess,
+                      onEditLinks: widget.onEditLinks,
                       onDeleteDecision: widget.onDeleteDecision,
                       onCompleteTask: widget.onCompleteTask,
                     ),
@@ -185,7 +193,11 @@ class FlowchartState extends State<Flowchart> {
             top: 0,
             child: ElevatedButton.icon(
               onPressed: () {
-                widget.onEditProcess.call(null);
+                if (widget.displayOnly ?? false) {
+                  widget.onAddFromPredefined.call();
+                } else {
+                  widget.onAddOrEditProcess.call(null);
+                }
               },
               label: Text("הוספת משימה"),
               icon: Icon(Icons.add_rounded),
@@ -252,6 +264,7 @@ class Process extends StatefulWidget {
   final FlowStep data;
   final Function onDelete;
   final Function onEdit;
+  final Function onEditLinks;
   final Function? onCompleted;
   final bool isSelection;
   final bool displayOnly;
@@ -264,6 +277,7 @@ class Process extends StatefulWidget {
     required this.data,
     required this.onDelete,
     required this.onEdit,
+    required this.onEditLinks,
     this.isSelection = false,
     this.displayOnly = false,
     this.onSelected,
@@ -279,6 +293,7 @@ class _ProcessState extends State<Process> {
   bool _isHoveringDelete = false;
   bool _isHoveringDone = false;
   bool _isHoveringEdit = false;
+  bool _isHoveringEditLinks = false;
   bool _isHoveringProcess = false;
 
   @override
@@ -422,6 +437,27 @@ class _ProcessState extends State<Process> {
                     ),
                     onTap: () async {
                       await widget.onEdit.call(widget.id);
+                    },
+                  ),
+                  const SizedBox(width: 5),
+                  InkWell(
+                    child: MouseRegion(
+                      child: Icon(
+                        Icons.compare_arrows_rounded,
+                        size: 24,
+                        color: _isHoveringEditLinks
+                            ? const Color.fromARGB(255, 55, 112, 233)
+                            : const Color.fromARGB(255, 22, 149, 241),
+                      ),
+                      onEnter: (_) => setState(() {
+                        _isHoveringEditLinks = true;
+                      }),
+                      onExit: (_) => setState(() {
+                        _isHoveringEditLinks = false;
+                      }),
+                    ),
+                    onTap: () async {
+                      await widget.onEditLinks.call(widget.id);
                     },
                   ),
                 ],
