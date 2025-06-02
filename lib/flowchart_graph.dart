@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:graphite/graphite.dart';
 import 'package:intl/intl.dart' as intl;
@@ -1065,7 +1066,11 @@ class _FlowchartGraphState extends State<FlowchartGraph> {
   }) async {
     final deviceSize = MediaQuery.of(context).size;
     final padding = MediaQuery.of(context).padding;
-    final bottomPadding = Platform.isIOS ? 0 : padding.bottom;
+    final bottomPadding = kIsWeb
+        ? 0
+        : Platform.isIOS
+            ? 0
+            : padding.bottom;
     final deviceHeight = deviceSize.height - bottomPadding;
     List<String> selectedPredefinedTasks = preSelectedTasks ?? [];
     final TextEditingController taskCombinationQuestionName =
