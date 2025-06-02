@@ -152,42 +152,43 @@ class FlowchartState extends State<Flowchart> {
       textDirection: TextDirection.ltr,
       child: Stack(
         children: [
-          InteractiveViewer(
-            transformationController: viewTransformationController,
-            minScale: 0.25,
-            maxScale: 1,
-            constrained: false,
-            child: ConstrainedBox(
-              // constraints: BoxConstraints(minWidth: screenSize.width),
-              constraints: BoxConstraints(minWidth: screenSize.width),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: DirectGraph(
-                  list: list,
-                  defaultCellSize: const Size(250.0, 100.0),
-                  cellPadding:
-                      const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-                  contactEdgesDistance: 5,
-                  orientation: MatrixOrientation.Vertical,
-                  nodeBuilder: (BuildContext context, NodeInput node) =>
-                      Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: _buildNode(
-                      node,
-                      onDeleteProcess: widget.onDeleteProcess,
-                      onEditProcess: widget.onAddOrEditProcess,
-                      onEditLinks: widget.onEditLinks,
-                      onDeleteDecision: widget.onDeleteDecision,
-                      onCompleteTask: widget.onCompleteTask,
+          if (widget.flowChart.isNotEmpty)
+            InteractiveViewer(
+              transformationController: viewTransformationController,
+              minScale: 0.25,
+              maxScale: 1,
+              constrained: false,
+              child: ConstrainedBox(
+                // constraints: BoxConstraints(minWidth: screenSize.width),
+                constraints: BoxConstraints(minWidth: screenSize.width),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: DirectGraph(
+                    list: list,
+                    defaultCellSize: const Size(250.0, 100.0),
+                    cellPadding: const EdgeInsets.symmetric(
+                        vertical: 30, horizontal: 10),
+                    contactEdgesDistance: 5,
+                    orientation: MatrixOrientation.Vertical,
+                    nodeBuilder: (BuildContext context, NodeInput node) =>
+                        Padding(
+                      padding: const EdgeInsets.all(5),
+                      child: _buildNode(
+                        node,
+                        onDeleteProcess: widget.onDeleteProcess,
+                        onEditProcess: widget.onAddOrEditProcess,
+                        onEditLinks: widget.onEditLinks,
+                        onDeleteDecision: widget.onDeleteDecision,
+                        onCompleteTask: widget.onCompleteTask,
+                      ),
                     ),
+                    centered: true,
+                    minScale: .1,
+                    maxScale: 1,
                   ),
-                  centered: true,
-                  minScale: .1,
-                  maxScale: 1,
                 ),
               ),
             ),
-          ),
           Positioned(
             left: 0,
             top: 0,
