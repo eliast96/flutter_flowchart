@@ -257,9 +257,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 onAddDependsOnDependency: ({
                   required String id,
                   required List<FlowchartNode> dependsOnNodes,
-                }) {
+                  required bool isFromPredefinedTasks,
+                }) async {
                   debugPrint("onAddDependsOnDependency");
                   var editedNode = _exampleNodes.singleWhere((e) => e.id == id);
+                  if (isFromPredefinedTasks) {
+                    // If the dependsOn nodes are from predefined tasks, we need to insert them first
+                    var mapping = await _insertPredefinedTasksToGraph(
+                      dependsOnNodes.map((e) => e.id).toList(),
+                    );
+                    dependsOnNodes = dependsOnNodes.map((e) {
+                      return FlowchartNode(
+                        id: mapping[e.id]!,
+                        label: e.label,
+                        status: e.status,
+                        type: e.type,
+                        daysToFinish: e.daysToFinish,
+                        description: e.description,
+                      );
+                    }).toList();
+                  }
                   setState(() {
                     editedNode.dependsOnNodes.addAll(dependsOnNodes);
                   });
@@ -267,9 +284,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 onAddFollowUpDependency: ({
                   required String id,
                   required List<FlowchartNode> followUpNodes,
-                }) {
+                  required bool isFromPredefinedTasks,
+                }) async {
                   debugPrint("onAddFollowUpDependency");
                   var editedNode = _exampleNodes.singleWhere((e) => e.id == id);
+                  if (isFromPredefinedTasks) {
+                    // If the followup nodes are from predefined tasks, we need to insert them first
+                    var mapping = await _insertPredefinedTasksToGraph(
+                      followUpNodes.map((e) => e.id).toList(),
+                    );
+                    followUpNodes = followUpNodes.map((e) {
+                      return FlowchartNode(
+                        id: mapping[e.id]!,
+                        label: e.label,
+                        status: e.status,
+                        type: e.type,
+                        daysToFinish: e.daysToFinish,
+                        description: e.description,
+                      );
+                    }).toList();
+                  }
                   setState(() {
                     editedNode.followupNodes.addAll(followUpNodes);
                   });

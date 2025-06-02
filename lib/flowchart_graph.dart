@@ -138,17 +138,21 @@ class FlowchartGraph extends StatefulWidget {
   // A function that is called when a "follow up" dependency is added
   // The first parameter is the id of the task that is being updated
   // The second parameter is a list of the follow up nodes that are being added
+  // The third parameter is an indicator if the followup is a new task from predefined tasks (true) or from an existing one from graph (false)
   final Function({
     required String id,
     required List<FlowchartNode> followUpNodes,
+    required bool isFromPredefinedTasks,
   }) onAddFollowUpDependency;
 
   // A function that is called when a "follow up" dependency is added
   // The first parameter is the id of the task that is being updated
   // The second parameter is a list of the follow up nodes that are being added
+  // The third parameter is an indicator if the followup is a new task from predefined tasks (true) or from an existing one from graph (false)
   final Function({
     required String id,
     required List<FlowchartNode> dependsOnNodes,
+    required bool isFromPredefinedTasks,
   }) onAddDependsOnDependency;
 
   // A function that is called when a task is added
@@ -2639,7 +2643,11 @@ class _FlowchartGraphState extends State<FlowchartGraph> {
   Future<void> _onEditLinks(String taskID) async {
     final deviceSize = MediaQuery.of(context).size;
     final padding = MediaQuery.of(context).padding;
-    final bottomPadding = Platform.isIOS ? 0 : padding.bottom;
+    final bottomPadding = kIsWeb
+        ? 0
+        : Platform.isIOS
+            ? 0
+            : padding.bottom;
     final deviceHeight = deviceSize.height - bottomPadding;
     bool isUpdatingDeps = false;
     bool isUpdatingFollowups = false;
@@ -2827,6 +2835,7 @@ class _FlowchartGraphState extends State<FlowchartGraph> {
                                                       taskID]!['DependsOn']!
                                                   .contains(e.id))
                                               .toList(),
+                                          isFromPredefinedTasks: false,
                                         );
                                         // await updatePredefinedTasksCombinationDependsOn(
                                         //   combID: taskID,
@@ -2946,9 +2955,19 @@ class _FlowchartGraphState extends State<FlowchartGraph> {
 
                                         if (!circularPathResponse.isFound) {
                                           // Add dependencies recursively
-                                          await widget.onPredefinedTasksAdded(
-                                            predefinedTaskIds: result[
-                                                'selectedPredefinedTasks'],
+                                          // await widget.onPredefinedTasksAdded(
+                                          //   predefinedTaskIds: result[
+                                          //       'selectedPredefinedTasks'],
+                                          // );
+                                          await widget.onAddDependsOnDependency(
+                                            id: editedTask.id,
+                                            dependsOnNodes: widget
+                                                .predefinedTasks
+                                                .where((e) => result[
+                                                        'selectedPredefinedTasks']
+                                                    .contains(e.id))
+                                                .toList(),
+                                            isFromPredefinedTasks: true,
                                           );
                                           // await _insertFollowupsAndDependencies(
                                           //   result['selectedPredefinedTasks']
@@ -3485,6 +3504,7 @@ class _FlowchartGraphState extends State<FlowchartGraph> {
                                                                 'FollowUps']!
                                                             .contains(e.id))
                                                     .toList(),
+                                                isFromPredefinedTasks: false,
                                               );
                                               // await updatePredefinedTasksCombinationFollowUps(
                                               //   combID: editekTask.id,
@@ -3802,10 +3822,21 @@ class _FlowchartGraphState extends State<FlowchartGraph> {
                                                 //   newCombs,
                                                 //   nextNodes,
                                                 // );
+                                                // await widget
+                                                //     .onPredefinedTasksAdded(
+                                                //   predefinedTaskIds: result[
+                                                //       'selectedPredefinedTasks'],
+                                                // );
                                                 await widget
-                                                    .onPredefinedTasksAdded(
-                                                  predefinedTaskIds: result[
-                                                      'selectedPredefinedTasks'],
+                                                    .onAddFollowUpDependency(
+                                                  id: editedTask.id,
+                                                  followUpNodes: widget
+                                                      .predefinedTasks
+                                                      .where((e) => result[
+                                                              'selectedPredefinedTasks']
+                                                          .contains(e.id))
+                                                      .toList(),
+                                                  isFromPredefinedTasks: true,
                                                 );
                                               }
 
